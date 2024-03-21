@@ -16,7 +16,7 @@ namespace Color
             {
                 StatusLabels();
 
-                SubmitNewPosition();
+                SubmitNewColor();
             }
 
             GUILayout.EndArea();
@@ -39,20 +39,20 @@ namespace Color
             GUILayout.Label("Mode: " + mode);
         }
 
-        static void SubmitNewPosition()
+        static void SubmitNewColor()
         {
             if (GUILayout.Button(NetworkManager.Singleton.IsServer ? "Change Color" : "Request Change Color"))
             {
                 if (NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsClient )
                 {
                     foreach (ulong uid in NetworkManager.Singleton.ConnectedClientsIds)
-                        NetworkManager.Singleton.SpawnManager.GetPlayerNetworkObject(uid).GetComponent<ColorPlayer>().Move();
+                        NetworkManager.Singleton.SpawnManager.GetPlayerNetworkObject(uid).GetComponent<ColorPlayer>().Recolor();
                 }
                 else
                 {
                     var playerObject = NetworkManager.Singleton.SpawnManager.GetLocalPlayerObject();
                     var player = playerObject.GetComponent<ColorPlayer>();
-                    player.Move();
+                    player.Recolor();
                 }
             }
         }

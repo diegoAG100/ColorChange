@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -5,37 +6,44 @@ namespace Color
 {
     public class ColorPlayer : NetworkBehaviour
     {
-        public NetworkVariable<Vector3> Position = new NetworkVariable<Vector3>();
-
+        public NetworkVariable<int> AssignedMaterial = new NetworkVariable<int>(0);
+        public List<Material> materials;
+        private MeshRenderer mesh;
+        private void Start(){
+            mesh = GetComponent<MeshRenderer>();
+        }
         public override void OnNetworkSpawn()
         {
             if (IsOwner)
             {
-                Move();
+                Recolor();
             }
         }
 
-        public void Move()
+        public void Recolor()
         {
-            SubmitPositionRequestServerRpc();
+            SubmitColorRequestServerRpc();
         }
 
         [Rpc(SendTo.Server)]
-        void SubmitPositionRequestServerRpc(RpcParams rpcParams = default)
+        void SubmitColorRequestServerRpc(RpcParams rpcParams = default)
         {
-            var randomPosition = GetRandomPositionOnPlane();
-            transform.position = randomPosition;
-            Position.Value = randomPosition;
+            int newIndex = RandomIndex();
+            AssignedMaterial.Value = newIndex;
         }
-
-        static Vector3 GetRandomPositionOnPlane()
-        {
-            return new Vector3(Random.Range(-3f, 3f), 1f, Random.Range(-3f, 3f));
+        int RandomIndex(){
+            int newIndex = Random.Range(0,materials.Count);
+            if(newIndex==AssignedMaterial.Value){
+                return RandomIndex();
+            }
+            else{
+                return newIndex;
+            }
         }
 
         void Update()
-        {
-            transform.position = Position.Value;
+        {   
+            mesh.material = materials[AssignedMaterial.Value];
         }
     }
 }
