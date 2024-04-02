@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
@@ -11,6 +12,8 @@ namespace Color
         public List<Material> materials;
         private MeshRenderer mesh;
         private int maxPlayers = 6;
+        private List<int> asignedIndex;
+        private bool firsTime = true;
         private void Start(){
             mesh = GetComponent<MeshRenderer>();
         }
@@ -35,12 +38,34 @@ namespace Color
         [Rpc(SendTo.Server)]
         void SubmitColorRequestServerRpc(RpcParams rpcParams = default)
         {
+            Debug.Log("Entrada");
+            Debug.Log(ColorManager.instance.materialAvaliable[0]);
+            Debug.Log(ColorManager.instance.materialAvaliable[1]);
+            Debug.Log(ColorManager.instance.materialAvaliable[2]);
+            Debug.Log(ColorManager.instance.materialAvaliable[3]);
+            Debug.Log(ColorManager.instance.materialAvaliable[4]);
+            Debug.Log(ColorManager.instance.materialAvaliable[5]);
             int newIndex = RandomIndex();
+            ColorManager.instance.materialAvaliable[newIndex]=null;
+            if(firsTime==true){
+                firsTime=false;
+            }
+            else{
+                ColorManager.instance.materialAvaliable[AssignedMaterial.Value]=materials[AssignedMaterial.Value];
+            }
+
             AssignedMaterial.Value = newIndex;
+                        Debug.Log("Salida");
+            Debug.Log(ColorManager.instance.materialAvaliable[0]);
+            Debug.Log(ColorManager.instance.materialAvaliable[1]);
+            Debug.Log(ColorManager.instance.materialAvaliable[2]);
+            Debug.Log(ColorManager.instance.materialAvaliable[3]);
+            Debug.Log(ColorManager.instance.materialAvaliable[4]);
+            Debug.Log(ColorManager.instance.materialAvaliable[5]);
         }
         int RandomIndex(){
             int newIndex = Random.Range(0,materials.Count);
-            if(newIndex==AssignedMaterial.Value){
+            if(ColorManager.instance.materialAvaliable[newIndex]==null){
                 return RandomIndex();
             }
             else{

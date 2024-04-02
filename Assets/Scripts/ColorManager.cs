@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -5,6 +6,13 @@ namespace Color
 {
     public class ColorManager : MonoBehaviour
     {
+        public static ColorManager instance;
+        public List<Material> materialAvaliable;
+
+        void Awake(){
+            instance = this;
+        }
+
         void OnGUI()
         {
             GUILayout.BeginArea(new Rect(10, 10, 300, 300));
@@ -57,4 +65,5 @@ namespace Color
             }
         }
     }
+
 }
