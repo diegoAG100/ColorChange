@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -9,11 +10,17 @@ namespace Color
         public NetworkVariable<int> AssignedMaterial = new NetworkVariable<int>(0);
         public List<Material> materials;
         private MeshRenderer mesh;
+        private int maxPlayers = 6;
         private void Start(){
             mesh = GetComponent<MeshRenderer>();
         }
         public override void OnNetworkSpawn()
         {
+            if(IsServer){
+                if(NetworkManager.Singleton.ConnectedClientsIds.Count>maxPlayers){
+                    Invoke("DisconectPlayer",0.01f);
+                }
+            }
             if (IsOwner)
             {
                 Recolor();
@@ -44,6 +51,10 @@ namespace Color
         void Update()
         {   
             mesh.material = materials[AssignedMaterial.Value];
+        }
+
+        void DisconectPlayer(){
+            NetworkManager.DisconnectClient(NetworkManager.Singleton.ConnectedClientsIds.Last());
         }
     }
 }
